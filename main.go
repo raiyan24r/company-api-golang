@@ -3,7 +3,6 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Println("dfsf")
-
+	fmt.Println("test")
 }
 
