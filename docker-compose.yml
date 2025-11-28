@@ -1,0 +1,52 @@
+services:
+  app:
+    build: .
+    container_name: company-api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - company-network
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.0
+    container_name: company-mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=company_db
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - company-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: company-phpmyadmin
+    environment:
+      - PMA_HOST=db
+      - PMA_PORT=3306
+      - PMA_USER=root
+      - PMA_PASSWORD=rootpassword
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+    networks:
+      - company-network
+    restart: unless-stopped
+
+networks:
+  company-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
