@@ -21,7 +21,7 @@ type Server struct {
 }
 
 func LoadConfig() (*Config, error) {
-	viper.SetConfigName("company-api-config")
+	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
 	viper.AddConfigPath("./config")
