@@ -94,10 +94,10 @@ func New() (*zap.Logger, error) {
     // File core
     fileCore := zapcore.NewCore(encoder, zapcore.AddSync(writer), zap.InfoLevel)
     // Stderr core
-    stderrCore := zapcore.NewCore(encoder, zapcore.AddSync(os.Stderr), zap.InfoLevel)
+    // stderrCore := zapcore.NewCore(encoder, zapcore.AddSync(os.Stderr), zap.InfoLevel)
 
     // Tee both cores so each log goes to file and stderr
-    core := zapcore.NewTee(fileCore, stderrCore)
+    core := zapcore.NewTee(fileCore /*, stderrCore*/)
     logger := zap.New(core, zap.AddCaller(), zap.AddStacktrace(zap.ErrorLevel))
     return logger, nil
 }

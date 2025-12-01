@@ -9,6 +9,7 @@ import (
 
 func Routes(handler handler.Handler) *chi.Mux {
 	r := chi.NewRouter()
+	w := handler.ErrorWrapper
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/health", http.StatusMovedPermanently)
@@ -19,7 +20,9 @@ func Routes(handler handler.Handler) *chi.Mux {
 		w.Write([]byte("OK"))
 	})
 
-	r.Get("/companies", handler.GetCompanies)
+	r.Route("/api/v1", func(r chi.Router) {
+		r.Get("/companies", w(handler.GetCompanies))
+	})
 
 	return r
 }
