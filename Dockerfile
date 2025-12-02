@@ -10,7 +10,8 @@ RUN go mod download
 # Copy source code
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+# Build the API binary from the correct package path
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main ./app/api
 
 FROM golang:1.25-alpine
 

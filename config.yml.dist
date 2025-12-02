@@ -3,3 +3,12 @@ app:
   environment: "local"
 server:
   port: 8080
+db:
+  host: "localhost"
+  port: 3307
+  user: ""
+  password: ""
+  name: ""
+  maxIdleConns: 
+  maxOpenConns: 
+  connMaxLifetime: ""
