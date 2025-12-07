@@ -1,10 +1,14 @@
 package handler
 
 import (
+	"company-api/app/api/handler/request"
 	"company-api/app/api/handler/response"
+	"encoding/json"
 	"errors"
 	"math/rand"
 	"net/http"
+
+	"go.uber.org/zap"
 )
 
 func (h *Handler) GetCompanies(w http.ResponseWriter, r *http.Request) error {
@@ -19,4 +23,14 @@ func (h *Handler) GetCompanies(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	return h.writeResponse(r.Context(), w, http.StatusOK, companies)
+}
+
+func (h *Handler) StoreCompany(w http.ResponseWriter, r *http.Request) error {
+	var companyRequest request.Company
+	if err := json.NewDecoder(r.Body).Decode(&companyRequest); err != nil {
+		h.Log.Error("Failed to decode request body", zap.Error(err))
+		return err
+	}
+
+	return h.writeResponse(r.Context(), w, http.StatusCreated, map[string]string{"status": "company created"})
 }

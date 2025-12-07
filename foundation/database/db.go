@@ -1,4 +1,4 @@
-package database
+package mysqldb
 
 import (
 	"database/sql"
@@ -14,9 +14,9 @@ type Config struct {
 	User            string
 	Password        string
 	Name            string
-	MaxIdleConns    int
-	MaxOpenConns    int
-	ConnMaxLifetime time.Duration
+	MaxIdleConns    int    `mapstructure:"maxIdleConns"`
+	MaxOpenConns    int    `mapstructure:"maxOpenConns"`
+	ConnMaxLifetime time.Duration `mapstructure:"connMaxLifetime"`
 }
 
 func Open(cfg Config) (*sql.DB, error) {

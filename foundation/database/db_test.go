@@ -1,13 +1,13 @@
-package database_test
+package mysqldb_test
 
 import (
-	"company-api/foundation/database"
+	mysqldb "company-api/foundation/database"
 	"testing"
 	"time"
 )
 
 func TestOpen_Success(t *testing.T) {
-	cfg := database.Config{
+	cfg := mysqldb.Config{
 		Host:            "localhost",
 		Port:            3307,
 		User:            "root",
@@ -18,7 +18,7 @@ func TestOpen_Success(t *testing.T) {
 		ConnMaxLifetime: time.Hour,
 	}
 
-	db, err := database.Open(cfg)
+	db, err := mysqldb.Open(cfg)
 	if err != nil {
 		t.Fatalf("Expected successful connection, got error: %v", err)
 	}
@@ -30,7 +30,7 @@ func TestOpen_Success(t *testing.T) {
 }
 
 func TestOpen_QueryDatabase(t *testing.T) {
-	cfg := database.Config{
+	cfg := mysqldb.Config{
 		Host:            "localhost",
 		Port:            3307,
 		User:            "root",
@@ -41,7 +41,7 @@ func TestOpen_QueryDatabase(t *testing.T) {
 		ConnMaxLifetime: time.Hour,
 	}
 
-	db, err := database.Open(cfg)
+	db, err := mysqldb.Open(cfg)
 	if err != nil {
 		t.Fatalf("Failed to connect: %v", err)
 	}
@@ -61,7 +61,7 @@ func TestOpen_QueryDatabase(t *testing.T) {
 }
 
 func TestOpen_InvalidCredentials(t *testing.T) {
-	cfg := database.Config{
+	cfg := mysqldb.Config{
 		Host:            "localhost",
 		Port:            3307,
 		User:            "invalid_user",
@@ -72,7 +72,7 @@ func TestOpen_InvalidCredentials(t *testing.T) {
 		ConnMaxLifetime: time.Hour,
 	}
 
-	db, err := database.Open(cfg)
+	db, err := mysqldb.Open(cfg)
 	if err == nil {
 		db.Close()
 		t.Fatal("Expected connection to fail with invalid credentials")
@@ -82,7 +82,7 @@ func TestOpen_InvalidCredentials(t *testing.T) {
 }
 
 func TestOpen_InvalidPort(t *testing.T) {
-	cfg := database.Config{
+	cfg := mysqldb.Config{
 		Host:            "localhost",
 		Port:            9999,
 		User:            "root",
@@ -93,7 +93,7 @@ func TestOpen_InvalidPort(t *testing.T) {
 		ConnMaxLifetime: time.Hour,
 	}
 
-	db, err := database.Open(cfg)
+	db, err := mysqldb.Open(cfg)
 	if err == nil {
 		db.Close()
 		t.Fatal("Expected connection to fail with invalid port")
@@ -103,7 +103,7 @@ func TestOpen_InvalidPort(t *testing.T) {
 }
 
 func TestOpen_ConnectionPoolSettings(t *testing.T) {
-	cfg := database.Config{
+	cfg := mysqldb.Config{
 		Host:            "localhost",
 		Port:            3307,
 		User:            "root",
@@ -114,7 +114,7 @@ func TestOpen_ConnectionPoolSettings(t *testing.T) {
 		ConnMaxLifetime: 30 * time.Minute,
 	}
 
-	db, err := database.Open(cfg)
+	db, err := mysqldb.Open(cfg)
 	if err != nil {
 		t.Fatalf("Failed to connect: %v", err)
 	}

@@ -1,0 +1,1 @@
+INSERT INTO companies (name, description, amount_of_employees, registered, type) VALUES (?, ?, ?, ?, ?);

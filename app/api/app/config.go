@@ -1,6 +1,7 @@
 package app
 
 import (
+	mysqldb "company-api/foundation/database"
 	"fmt"
 
 	"github.com/spf13/viper"
@@ -9,7 +10,7 @@ import (
 type Config struct {
 	App    APP
 	Server Server
-	DB     DB
+	DB     mysqldb.Config
 }
 
 type APP struct {
@@ -19,17 +20,6 @@ type APP struct {
 
 type Server struct {
 	Port int
-}
-
-type DB struct {
-	Host            string
-	Port            int
-	User            string
-	Password        string
-	Name            string
-	MaxIdleConns    int    `mapstructure:"maxIdleConns"`
-	MaxOpenConns    int    `mapstructure:"maxOpenConns"`
-	ConnMaxLifetime string `mapstructure:"connMaxLifetime"`
 }
 
 func LoadConfig() (*Config, error) {

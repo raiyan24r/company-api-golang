@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"company-api/business/database"
 	"context"
 	"encoding/json"
 	"net/http"
@@ -11,13 +12,15 @@ import (
 
 type Handler struct {
 	Log *zap.Logger
+	dbRepo  database.Database
 }
 
 type HandlerFunc func(w http.ResponseWriter, r *http.Request) error
 
-func New(logger *zap.Logger) Handler {
+func New(logger *zap.Logger, database database.Database) Handler {
 	return Handler{
 		Log: logger,
+		dbRepo: database,
 	}
 }
 
