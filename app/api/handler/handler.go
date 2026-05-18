@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"company-api/business/database"
+	"company-api/app/api/app"
 	"context"
 	"encoding/json"
 	"net/http"
@@ -11,16 +11,14 @@ import (
 )
 
 type Handler struct {
-	Log *zap.Logger
-	dbRepo  database.Database
+	App *app.App
 }
 
 type HandlerFunc func(w http.ResponseWriter, r *http.Request) error
 
-func New(logger *zap.Logger, database database.Database) Handler {
+func New(a *app.App) Handler {
 	return Handler{
-		Log: logger,
-		dbRepo: database,
+		App: a,
 	}
 }
 
@@ -37,7 +35,7 @@ func (h Handler) ErrorWrapper(mainFunc HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := mainFunc(w, r)
 		if err != nil {
-			h.Log.Error("Handler error", zap.Error(err))
+			h.App.Log.Error("Handler error", zap.Error(err))
 			h.writeErrorResponse(r.Context(), w, http.StatusInternalServerError, err.Error())
 		}
 	}
@@ -52,14 +50,14 @@ func (h Handler) writeResponse(ctx context.Context, w http.ResponseWriter, statu
 
 	if b, ok := data.([]byte); ok {
 		if _, err := w.Write(b); err != nil {
-			h.Log.Error("Failed to write response", zap.Error(err))
+			h.App.Log.Error("Failed to write response", zap.Error(err))
 			return err
 		}
 		return nil
 	}
 
 	if err := json.NewEncoder(w).Encode(data); err != nil {
-		h.Log.Error("Failed to send response", zap.Error(err))
+		h.App.Log.Error("Failed to send response", zap.Error(err))
 	}
 
 	return nil
@@ -76,6 +74,6 @@ func (h Handler) writeErrorResponse(ctx context.Context, w http.ResponseWriter, 
 	}
 
 	if err := json.NewEncoder(w).Encode(errorResp); err != nil {
-		h.Log.Error("Failed to send error response", zap.Error(err))
+		h.App.Log.Error("Failed to send error response", zap.Error(err))
 	}
 }

@@ -3,34 +3,143 @@ package handler
 import (
 	"company-api/app/api/handler/request"
 	"company-api/app/api/handler/response"
+	"company-api/business/database"
 	"encoding/json"
-	"errors"
-	"math/rand"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 )
 
 func (h *Handler) GetCompanies(w http.ResponseWriter, r *http.Request) error {
-	if rand.Intn(3) == 0 {
-		return errors.New("simulated internal error")
+	companies, err := h.App.DbRepo.GetAllCompanies()
+	if err != nil {
+		h.App.Log.Error("Failed to fetch companies", zap.Error(err))
+		return err
 	}
 
-	companies := []response.Company{
-		{ID: 1, Name: "Tech Innovators Inc.", Description: "Leading tech company", AmountOfEmployees: 500, Registered: true, Type: "Technology"},
-		{ID: 2, Name: "Green Energy Solutions", Description: "Renewable energy provider", AmountOfEmployees: 200, Registered: true, Type: "Energy"},
-		{ID: 3, Name: "HealthPlus Corp.", Description: "Healthcare services", AmountOfEmployees: 300, Registered: true, Type: "Healthcare"},
+	if companies == nil {
+		companies = []database.Company{}
 	}
 
-	return h.writeResponse(r.Context(), w, http.StatusOK, companies)
+	responseCompanies := make([]response.Company, len(companies))
+	for i, c := range companies {
+		responseCompanies[i] = response.Company{
+			ID:                c.ID,
+			Name:              c.Name,
+			Description:       c.Description,
+			AmountOfEmployees: c.AmountOfEmployees,
+			Registered:        c.Registered,
+			Type:              c.Type,
+		}
+	}
+
+	return h.writeResponse(r.Context(), w, http.StatusOK, responseCompanies)
 }
 
 func (h *Handler) StoreCompany(w http.ResponseWriter, r *http.Request) error {
 	var companyRequest request.Company
 	if err := json.NewDecoder(r.Body).Decode(&companyRequest); err != nil {
-		h.Log.Error("Failed to decode request body", zap.Error(err))
+		h.App.Log.Error("Failed to decode request body", zap.Error(err))
 		return err
 	}
 
-	return h.writeResponse(r.Context(), w, http.StatusCreated, map[string]string{"status": "company created"})
+	dbCompany := database.Company{
+		Name:              companyRequest.Name,
+		Description:       companyRequest.Description,
+		AmountOfEmployees: companyRequest.AmountOfEmployees,
+		Registered:        companyRequest.Registered,
+		Type:              companyRequest.Type,
+	}
+
+	id, err := h.App.DbRepo.CreateCompany(dbCompany)
+	if err != nil {
+		h.App.Log.Error("Failed to create company", zap.Error(err))
+		return err
+	}
+
+	return h.writeResponse(r.Context(), w, http.StatusCreated, map[string]interface{}{"id": id, "status": "company created"})
+}
+
+func (h *Handler) GetCompanyByID(w http.ResponseWriter, r *http.Request) error {
+	id := chi.URLParam(r, "id")
+
+	company, err := h.App.DbRepo.GetCompanyByID(id)
+	if err != nil {
+		h.App.Log.Error("Failed to fetch company", zap.Error(err))
+		return err
+	}
+
+	if company == nil {
+		h.writeErrorResponse(r.Context(), w, http.StatusNotFound, "company not found")
+		return nil
+	}
+
+	responseCompany := response.Company{
+		ID:                company.ID,
+		Name:              company.Name,
+		Description:       company.Description,
+		AmountOfEmployees: company.AmountOfEmployees,
+		Registered:        company.Registered,
+		Type:              company.Type,
+	}
+
+	return h.writeResponse(r.Context(), w, http.StatusOK, responseCompany)
+}
+
+func (h *Handler) UpdateCompany(w http.ResponseWriter, r *http.Request) error {
+	id := chi.URLParam(r, "id")
+
+	// Check if company exists
+	company, err := h.App.DbRepo.GetCompanyByID(id)
+	if err != nil {
+		h.App.Log.Error("Failed to fetch company", zap.Error(err))
+		return err
+	}
+
+	if company == nil {
+		h.writeErrorResponse(r.Context(), w, http.StatusNotFound, "company not found")
+		return nil
+	}
+
+	// Parse request body
+	var updateReq request.UpdateCompany
+	if err := json.NewDecoder(r.Body).Decode(&updateReq); err != nil {
+		h.App.Log.Error("Failed to decode request body", zap.Error(err))
+		return err
+	}
+
+	// Apply updates (only update fields that are provided)
+	if updateReq.Name != nil {
+		company.Name = *updateReq.Name
+	}
+	if updateReq.Description != nil {
+		company.Description = *updateReq.Description
+	}
+	if updateReq.AmountOfEmployees != nil {
+		company.AmountOfEmployees = *updateReq.AmountOfEmployees
+	}
+	if updateReq.Registered != nil {
+		company.Registered = *updateReq.Registered
+	}
+	if updateReq.Type != nil {
+		company.Type = *updateReq.Type
+	}
+
+	// Update in database
+	if err := h.App.DbRepo.UpdateCompany(id, *company); err != nil {
+		h.App.Log.Error("Failed to update company", zap.Error(err))
+		return err
+	}
+
+	responseCompany := response.Company{
+		ID:                company.ID,
+		Name:              company.Name,
+		Description:       company.Description,
+		AmountOfEmployees: company.AmountOfEmployees,
+		Registered:        company.Registered,
+		Type:              company.Type,
+	}
+
+	return h.writeResponse(r.Context(), w, http.StatusOK, responseCompany)
 }

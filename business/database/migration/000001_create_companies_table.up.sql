@@ -1,6 +1,6 @@
 CREATE TABLE companies (
     id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
-    name VARCHAR(15) NOT NULL UNIQUE,
+    name VARCHAR(50) NOT NULL UNIQUE,
     description VARCHAR(3000),
     amount_of_employees INT NOT NULL,
     registered BOOLEAN NOT NULL DEFAULT FALSE,

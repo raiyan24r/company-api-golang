@@ -33,3 +33,9 @@ migrate-down:
 migrate-create:
 	@if [ -z "$(NAME)" ]; then echo "Usage: make migrate-create NAME=<snake_case_name>"; exit 1; fi
 	migrate create -ext sql -dir $(MIGRATE_PATH) -seq $(NAME)
+
+# Seed the database (use COUNT=<number> to specify number of companies, default is 5)
+seed:
+	@COUNT=$${COUNT:-5}; \
+	echo "Seeding database with $$COUNT companies..."; \
+	go run ./cmd/seeder -count $$COUNT

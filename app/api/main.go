@@ -3,7 +3,6 @@ package main
 import (
 	"company-api/app/api/app"
 	"company-api/app/api/handler"
-	"company-api/app/api/route"
 	"company-api/business/database"
 	mysqldb "company-api/foundation/database"
 	"company-api/foundation/logger"
@@ -26,17 +25,16 @@ func main() {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
-	_ = app.New(context.Background(), *cfg, logger)
-
-
-	mysqlDb,_ := mysqldb.Open(cfg.DB)
+	mysqlDb, _ := mysqldb.Open(cfg.DB)
 	dbRepo := database.New(mysqlDb)
 
-	h := handler.New(logger, *dbRepo)
+	a := app.New(context.Background(), *cfg, logger, dbRepo)
+
+	h := handler.New(a)
 
 	log.Println("Application started on port"+fmt.Sprintf(":%d", cfg.Server.Port))
 
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", cfg.Server.Port), route.Routes(h)); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", cfg.Server.Port), handler.Routes(h)); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 

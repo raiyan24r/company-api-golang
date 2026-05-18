@@ -1,13 +1,12 @@
-package route
+package handler
 
 import (
-	"company-api/app/api/handler"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 )
 
-func Routes(handler handler.Handler) *chi.Mux {
+func Routes(handler Handler) *chi.Mux {
 	r := chi.NewRouter()
 	w := handler.ErrorWrapper
 
@@ -22,6 +21,9 @@ func Routes(handler handler.Handler) *chi.Mux {
 
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Get("/companies", w(handler.GetCompanies))
+		r.Post("/companies", w(handler.StoreCompany))
+		r.Get("/companies/{id}", w(handler.GetCompanyByID))
+		r.Put("/companies/{id}", w(handler.UpdateCompany))
 	})
 
 	return r
