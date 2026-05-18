@@ -16,7 +16,7 @@ This checklist tracks what’s already in place and what remains to make the ser
 - [x] README baseline (`README.md`)
 
 ## To Do — Core API
-- [ ] Define canonical `Company` domain model with validation:
+- [x] Define canonical `Company` domain model with validation:
   - `id` (UUID, required)
   - `name` (string ≤15 chars, required, unique)
   - `description` (string ≤3000 chars, optional)
@@ -24,10 +24,10 @@ This checklist tracks what’s already in place and what remains to make the ser
   - `registered` (bool, required)
   - `type` (enum: Corporations | NonProfit | Cooperative | Sole Proprietorship)
 - [ ] REST endpoints (Chi router) with JSON:
-  - [ ] POST `/companies` — Create
-  - [ ] PATCH `/companies/{id}` — Partial update
+  - [x] POST `/companies` — Create
+  - [x] PATCH `/companies/{id}` — Partial update
   - [ ] DELETE `/companies/{id}` — Delete
-  - [ ] GET `/companies/{id}` — Get one
+  - [x] GET `/companies/{id}` — Get one
 - [ ] Request/response DTOs and mappers between DTO ↔ domain ↔ storage
 - [ ] Input validation: length checks, enum validation, required fields, type safety
 - [ ] Error model: consistent error responses (`app/api/handler/response/error.go`)
@@ -41,15 +41,15 @@ This checklist tracks what’s already in place and what remains to make the ser
 - [ ] Optional: role-based authorization checks for future extension
 
 ## To Do — Persistence
-- [ ] Finalize companies table schema with constraints:
-  - [ ] `name` UNIQUE index
-  - [ ] `type` constrained to enum values (DB CHECK or app-level guard)
-  - [ ] `id` UUID primary key (stored as `CHAR(36)` or `BINARY(16)`)
+- [x] Finalize companies table schema with constraints:
+  - [x] `name` UNIQUE index
+  - [x] `type` constrained to enum values (DB CHECK or app-level guard)
+  - [x] `id` UUID primary key (stored as `CHAR(36)` or `BINARY(16)`)
 - [ ] Implement repository methods:
-  - [ ] `CreateCompany(ctx, Company)`
-  - [ ] `PatchCompany(ctx, id, PatchCompany)` with partial update logic
+  - [x] `CreateCompany(ctx, Company)`
+  - [x] `PatchCompany(ctx, id, PatchCompany)` with partial update logic
   - [ ] `DeleteCompany(ctx, id)`
-  - [ ] `GetCompany(ctx, id)`
+  - [x] `GetCompany(ctx, id)`
 - [ ] Transactions where appropriate; proper `context.Context` usage
 - [ ] Migrate on startup or provide `make migrate` target
 
